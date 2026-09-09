@@ -17,30 +17,27 @@ Smoke-test locally:
 npm run preview
 ```
 
-## Hosting options
+## GitHub Pages (this repo)
 
-Any static host works. Examples:
+Site URL after deploy:
 
-### GitHub Pages
+**https://wmaminuddin.github.io/china-trip-proposal-2026/**
 
-1. In the repo: **Settings → Pages**.
-2. Source: GitHub Actions or deploy `dist/` from the `main` branch (or `gh-pages`).
-3. If deploying to a project pages URL (`https://<user>.github.io/<repo>/`), set Vite `base` in `vite.config.ts`:
+- Vite `base` is set to `/china-trip-proposal-2026/` in `vite.config.ts`
+- Workflow: [`.github/workflows/deploy-pages.yml`](../.github/workflows/deploy-pages.yml) builds on every push to `main` and publishes the `dist/` artifact
+- Hash routes (`#summary`, `#package`, …) work without server rewrites
 
-```ts
-export default defineConfig({
-  base: '/china-trip-proposal-2026/',
-  // ...
-})
-```
+Manual re-run: **Actions → Deploy GitHub Pages → Run workflow**.
 
-Hash routing (`#summary`, etc.) works well with GitHub Pages (no server rewrite needed).
+> Free GitHub accounts need a **public** repository for GitHub Pages. Visibility can be changed under repo Settings if needed.
+
+## Other hosts
 
 ### Netlify / Cloudflare Pages / Vercel
 
 - Build command: `npm run build`
 - Publish directory: `dist`
-- No special redirects required for hash routes
+- If hosting at the site root, set `base: '/'` in `vite.config.ts` (or remove the `base` option)
 
 ## Environment
 
@@ -55,4 +52,4 @@ Use the in-app **Print** or **Print full** buttons, then the browser’s print d
 
 ## Security note
 
-This repo may contain **indicative budgets and internal planning copy**. Prefer a **private** GitHub repository unless you intentionally want public sharing. Do not commit secrets (none are used by default).
+This site may show **indicative budgets and internal planning copy**. Publishing on GitHub Pages makes that content reachable by anyone with the URL once the repo (or Pages site) is public.

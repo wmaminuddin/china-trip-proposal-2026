@@ -170,7 +170,9 @@ Clicking CIIF / CIIE on the summary page switches to a matching option, preferri
 |-----|----------|
 | [README.md](README.md) | This file — overview, run, customise |
 | [docs/DATA-MODEL.md](docs/DATA-MODEL.md) | Types, option IDs, flight slots, hotel fields |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Static build & hosting notes |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Static build, **GitHub Pages**, hosting |
+
+**Live site (GitHub Pages):** https://wmaminuddin.github.io/china-trip-proposal-2026/
 
 ---
 
