@@ -62,7 +62,7 @@ export function OptionMatrix({
     <section id="options" className="section">
       <div className="section-head">
         <p className="eyebrow">Annex A</p>
-        <h2>Thirteen itinerary options</h2>
+        <h2>Fourteen itinerary options</h2>
         <p className="lede">
           Filter by fair, depth, and route order. Select one package for the detailed annex, or
           compare up to {MAX_COMPARE} options (summary + day-by-day). Budget figures are{' '}
@@ -80,7 +80,7 @@ export function OptionMatrix({
               className={fairFilter === v ? 'chip active' : 'chip'}
               onClick={() => onFairFilter(v)}
             >
-              {v === 'ALL' ? 'All' : v === 'NONE' ? 'None' : v}
+              {v === 'ALL' ? 'All' : v === 'NONE' ? 'None (LZH+WUH)' : v}
             </button>
           ))}
         </div>
@@ -152,6 +152,10 @@ export function OptionMatrix({
                   </dd>
                 </div>
                 <div>
+                  <dt>Wuhan</dt>
+                  <dd>{o.wuhanDays}d</dd>
+                </div>
+                <div>
                   <dt>ITaLI budget</dt>
                   <dd>{formatMyr(budget.total)}</dd>
                 </div>
@@ -207,6 +211,9 @@ export function OptionMatrix({
                   </li>
                   <li>
                     <strong>LRVTC:</strong> {o.LRVTCDays} days ({o.LRVTCMode})
+                  </li>
+                  <li>
+                    <strong>Wuhan:</strong> {o.wuhanDays} days
                   </li>
                   <li>
                     <strong>ITaLI budget ({ITALI_BUDGET_PAX} pax):</strong>{' '}
@@ -286,8 +293,8 @@ export function OptionMatrix({
         {options.map((o) => (
           <p key={o.id}>
             <strong>{o.name}</strong> — {o.durationLabel}; fair {o.fairDays}d; LRVTC {o.LRVTCDays}d (
-            {o.LRVTCMode}); ITaLI est. {formatMyr(calcBudget(o).total)} for {ITALI_BUDGET_PAX} pax
-            (DDE excluded). {o.windowLabel}
+            {o.LRVTCMode}); Wuhan {o.wuhanDays}d; ITaLI est. {formatMyr(calcBudget(o).total)} for{' '}
+            {ITALI_BUDGET_PAX} pax (DDE excluded). {o.windowLabel}
           </p>
         ))}
       </div>
@@ -313,6 +320,8 @@ export function ItinerarySection({ option }: { option: TripOption }) {
             <span className="line" />
             <span>Liuzhou LRVTC</span>
             <span className="line" />
+            <span>Wuhan</span>
+            <span className="line" />
             <span>KLIA</span>
           </>
         ) : option.routeOrder === 'liuzhou-first' ? (
@@ -320,6 +329,8 @@ export function ItinerarySection({ option }: { option: TripOption }) {
             <span>KLIA</span>
             <span className="line" />
             <span>Liuzhou LRVTC</span>
+            <span className="line" />
+            <span>Wuhan</span>
             <span className="line" />
             <span>Shanghai NECC</span>
             <span className="line" />
@@ -332,6 +343,8 @@ export function ItinerarySection({ option }: { option: TripOption }) {
             <span>Shanghai NECC</span>
             <span className="line" />
             <span>Liuzhou LRVTC</span>
+            <span className="line" />
+            <span>Wuhan</span>
             <span className="line" />
             <span>KLIA</span>
           </>

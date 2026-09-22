@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { NAV_ITEMS, PROPOSAL_META } from './data/content'
 import {
   DEFAULT_OPTION_ID,
@@ -53,6 +53,7 @@ function App() {
   const [flightKeys, setFlightKeys] = useState(emptyFlights)
   const [shanghaiHotelName, setShanghaiHotelName] = useState<string | null>(null)
   const [liuzhouHotelName, setLiuzhouHotelName] = useState<string | null>(null)
+  const [wuhanHotelName, setWuhanHotelName] = useState<string | null>(null)
 
   const selected = useMemo(() => getOption(selectedId), [selectedId])
 
@@ -106,7 +107,11 @@ function App() {
 
   function selectFair(fair: FairId) {
     if (fair === 'NONE') {
-      const only = OPTIONS.find((o) => o.id === 'L1')
+      const keep =
+        selected.id === 'L1' || selected.id === 'L2'
+          ? OPTIONS.find((o) => o.id === selected.id)
+          : undefined
+      const only = keep ?? OPTIONS.find((o) => o.id === 'L1')
       if (only) {
         const prev = selected
         setSelectedId(only.id)
@@ -175,8 +180,10 @@ function App() {
     onFlightPick: pickFlight,
     shanghaiHotelName,
     liuzhouHotelName,
+    wuhanHotelName,
     onShanghaiHotel: setShanghaiHotelName,
     onLiuzhouHotel: setLiuzhouHotelName,
+    onWuhanHotel: setWuhanHotelName,
   }
 
   return (

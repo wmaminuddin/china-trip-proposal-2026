@@ -1,6 +1,7 @@
 ﻿export const PROPOSAL_META = {
   title: 'China Business Trip Proposal 2026',
-  subtitle: 'Industry fair tech scouting + Liuzhou railway process learning (ECRL)',
+  subtitle:
+    'Industry fair tech scouting + LRVTC campus review + Wuhan CRRC / rail ops (ECRL)',
   departments: 'ITaLI (3) · DDE (3–5) · Total 6–8 pax · Budget: ITaLI only',
   origin: 'KLIA → China → KLIA',
   recommendedId: 'C1',
@@ -13,7 +14,7 @@ export const OBJECTIVES = [
   },
   {
     title: 'Railway process learning',
-    body: 'At Liuzhou Railway Vocational & Technical College (LRVTC), study how China trains and operates railway processes relevant to ECRL — classroom, hands-on, and day/night shift observation.',
+    body: 'At LRVTC (Liuzhou), review campus facilities and training approaches; in Wuhan, deepen practical learning at CRRC Yangtze (car carrier wagons) and automotive rail day/night operations relevant to ECRL.',
   },
   {
     title: 'Cross-department capability',
@@ -27,14 +28,14 @@ export const OUTCOMES = [
     items: [
       'Explore and evaluate new tech (digital twin, robotics, sensors, logistics-adjacent)',
       'Vendor contact list + capability notes (what solves which ops pain)',
-      'At LRVTC: confirm and document railway operations processes relevant to our work',
+      'At LRVTC and Wuhan: confirm and document railway / wagon ops processes relevant to our work',
     ],
   },
   {
     owner: 'DDE',
     items: [
       'Documented railway process observations mapped to ECRL context',
-      'Notes from classroom, hands-on, and (where included) day/night shifts',
+      'Notes from LRVTC facility review plus Wuhan CRRC and day/night rail ops',
       'Training / SOP ideas transferable to local railway logistics workflows',
     ],
   },
@@ -102,25 +103,39 @@ export const TECH_CHECKLIST = [
 
 export const LRVTC_AGENDA = {
   status: 'Not confirmed — proposed programme for host approval',
-  college: 'Liuzhou Railway Vocational & Technical College (LRVTC)',
+  college: 'Liuzhou Railway Vocational & Technical College (LRVTC) + CRRC Yangtze Wuhan',
   blocks: [
-    { days: '1.0 day', title: 'Classroom briefing', detail: 'China railway operations overview; ECRL-relevant process themes; instructor Q&A.' },
-    { days: '1.0 day', title: 'Hands-on learning', detail: 'Labs / simulators / workshops as hosted by LRVTC.' },
-    { days: '1.5 days', title: 'Day & night shift learning', detail: 'Supervised day observation plus night-shift learning with mandatory safety briefing.' },
+    {
+      days: '1.0 day',
+      title: 'LRVTC campus & facility review',
+      detail:
+        'Campus tour; observe classroom and practical training; review facilities, equipment, syllabus, safety and competency development.',
+    },
+    {
+      days: '1.0 day',
+      title: 'CRRC Yangtze Wuhan',
+      detail:
+        'Car carrier wagon requirements for Perodua; inspect double-deck wagon configuration, loading/securing, and modification discussion.',
+    },
+    {
+      days: '2.0 days',
+      title: 'Automotive rail operations (day + night)',
+      detail:
+        'Daytime loading/unloading, lashing, ramp and workforce workflow; night observation with mandatory safety briefing.',
+    },
   ],
   draftEmail: `Subject: Request for study visit — ITaLI & DDE (Malaysia) | Railway process learning related to ECRL
 
 Dear LRVTC International / Training Office,
 
-We represent a joint team from ITaLI and DDE (Malaysia). We respectfully request a study visit to Liuzhou Railway Vocational & Technical College to learn how China approaches railway operations training and processes, with relevance to the East Coast Rail Link (ECRL).
+We represent a joint team from ITaLI and DDE (Malaysia). We respectfully request a study visit to Liuzhou Railway Vocational & Technical College to review campus facilities and training approaches relevant to the East Coast Rail Link (ECRL). Practical automotive rail observation is planned separately in Wuhan (CRRC Yangtze).
 
-Proposed programme (flexible to your advice):
-1. Classroom briefing — 1 day
-2. Hands-on / laboratory learning — 1 day
-3. Day and night shift supervised learning — 1.5 days
+Proposed LRVTC programme (flexible to your advice):
+1. Campus / facility review and training observation — 1 day
+   (classroom & practical training observation; syllabus, equipment, safety arrangements)
 
 Proposed group size: 6–8 participants (3 from ITaLI; 3–5 from DDE).
-Preferred window: immediately after our attendance at [CIIF 12–16 Oct 2026 / CIIE 5–10 Nov 2026] in Shanghai (exact dates subject to your availability).
+Preferred window: around our attendance at [CIIF 12–16 Oct 2026 / CIIE 5–10 Nov 2026] in Shanghai, or a dedicated Liuzhou+Wuhan window (exact dates subject to your availability).
 
 We will cover our own travel, lodging, and insurance, and will follow all campus and site safety rules. Kindly advise available dates, any fees, language support, PPE requirements, and a point of contact.
 
@@ -132,16 +147,17 @@ on behalf of the ITaLI–DDE delegation
 
 ———
 尊敬的柳州铁道职业技术学院相关负责人：
-我们是马来西亚 ITaLI 与 DDE 联合代表团，希望赴贵校开展铁路运营与培训相关学习交流，并联系东海岸铁路（ECRL）背景。恳请协助安排约 3.5 天的课堂、实训及日/夜班观摩学习。详情见上文英文函。谢谢！`,
+我们是马来西亚 ITaLI 与 DDE 联合代表团，希望赴贵校开展约 1 天的校园与培训设施观摩交流，并联系东海岸铁路（ECRL）背景；实操观摩拟另行安排在武汉。详情见上文英文函。谢谢！`,
 }
 
 export const LOGISTICS = [
   {
     title: 'Routing',
     items: [
-      'Shanghai-first: KLIA → PVG → LZH → (PVG or CAN) → KLIA',
-      'Liuzhou-first: KLIA → LZH (via CAN or PVG) → PVG (fair) → KLIA',
-      'Liuzhou-only: KLIA → LZH (via CAN or PVG) → KLIA — no Shanghai fair',
+      'Shanghai-first: KLIA → Shanghai (fair) → Liuzhou (LRVTC) → Wuhan (CRRC/ops) → KLIA via hub',
+      'Liuzhou-first: KLIA → Liuzhou → Wuhan → Shanghai (fair) → KLIA',
+      'No fair: KLIA → Liuzhou → Wuhan → KLIA via hub',
+      'Liuzhou → Wuhan by high-speed rail (~5 hours); return flights from Wuhan (not Liuzhou)',
       'Book group seats early — 6–8 pax on the same sectors where possible',
     ],
   },
@@ -149,7 +165,7 @@ export const LOGISTICS = [
     title: 'Visa & entry',
     items: [
       'Confirm China visa / visa-free eligibility for each passport held',
-      'Carry invitation / fair registration / LRVTC correspondence hard copies',
+      'Carry invitation / fair registration / LRVTC / CRRC correspondence hard copies',
       'Allow buffer on first arrival day for immigration and transfers',
     ],
   },
@@ -158,30 +174,22 @@ export const LOGISTICS = [
     items: [
       'CIIF: pre-register professional visitors via official channels before travel',
       'CIIE: buyer/visitor registration via ciie.org / official app as required',
-      'Assign one admin owner for badges and group meeting point at NECC',
-    ],
-  },
-  {
-    title: 'Hotels & local transport',
-    items: [
-      'Shanghai: hotel near NECC / metro for exhibition days',
-      'Liuzhou: hotel near LRVTC or with reliable van transfer',
-      'Prefer pre-booked airport vans for group moves; DiDi as backup',
+      'Print badges / QR codes; carry passport copies daily',
     ],
   },
   {
     title: 'Risks & controls',
     items: [
-      'Night-shift learning: PPE, buddy system, host escort, opt-out without penalty',
-      'Language: arrange interpreter or bilingual colleague for LRVTC technical sessions',
+      'Night rail observation: PPE, buddy system, host escort, opt-out without penalty',
+      'Language: arrange interpreter or bilingual colleague for LRVTC / CRRC technical sessions',
       'Health: travel insurance covering all pax; shared emergency contact card',
-      'Schedule: protect 1 buffer night on full-depth options against flight disruption',
+      'Schedule: protect 1 buffer night on full-depth options against flight / HSR disruption',
     ],
   },
 ]
 
 export const DEPTH_LABELS: Record<string, string> = {
-  A: 'Protect Liuzhou',
+  A: 'Protect tech (LZH+Wuhan)',
   B: 'Protect Fair',
   C: 'Full Depth',
 }
@@ -196,4 +204,3 @@ export const NAV_ITEMS = [
   { id: 'lrvtc', label: 'LRVTC' },
   { id: 'admin', label: 'Admin' },
 ] as const
-

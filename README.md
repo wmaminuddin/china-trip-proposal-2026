@@ -5,7 +5,7 @@ Interactive web proposal for a joint **ITaLI + DDE** business trip from **KLIA**
 **Purpose:** help leadership compare itinerary packages that combine:
 
 1. **Technology scouting** at a Shanghai industry fair — **CIIF 2026** (12–16 Oct) or **CIIE 2026** (5–10 Nov)
-2. **Railway process learning** at **Liuzhou Railway Vocational & Technical College (LRVTC)** (ECRL-related; programme not yet confirmed with the host)
+2. **Railway process learning** — **LRVTC** campus / facility review in Liuzhou, then **CRRC Yangtze + automotive rail ops** in Wuhan (ECRL-related; hosts not yet confirmed)
 
 Default recommended package: **C1 · CIIF + Full Depth** (Shanghai-first).
 
@@ -38,7 +38,7 @@ npm run lint     # oxlint
 | Package | `#package` | Composer: pick option + flights + hotels → live ITaLI budget |
 | Options | `#options` | Filter / compare up to 3 packages; day-by-day annex |
 | Flights | `#flights` | Indicative flight catalog by leg |
-| Hotels | `#hotels` | 4–5★ candidates + Leaflet maps (Shanghai / Liuzhou) |
+| Hotels | `#hotels` | 4–5★ candidates + Leaflet maps (Shanghai / Liuzhou / Wuhan) |
 | Budget | `#budget` | Planning-band budget for selected option |
 | LRVTC | `#lrvtc` | Draft invitation (EN + short CN courtesy) |
 | Admin | `#admin` | Checklist + logistics |
@@ -47,7 +47,7 @@ npm run lint     # oxlint
 
 ---
 
-## Itinerary options (13)
+## Itinerary options (14)
 
 Options are defined in [`src/data/options.ts`](src/data/options.ts).
 
@@ -55,29 +55,34 @@ Options are defined in [`src/data/options.ts`](src/data/options.ts).
 
 | Dimension | Values |
 |-----------|--------|
-| **Fair** | `CIIF`, `CIIE`, or `NONE` (Liuzhou-only) |
-| **Depth** | `A` Protect Liuzhou · `B` Protect Fair · `C` Full Depth |
+| **Fair** | `CIIF`, `CIIE`, or `NONE` (Liuzhou + Wuhan, no fair) |
+| **Depth** | `A` Protect tech (LZH+Wuhan) · `B` Protect Fair · `C` Full Depth |
 | **Route order** | `shanghai-first` · `liuzhou-first` · `liuzhou-only` |
 
 ### Matrix
 
 | ID | Fair | Depth | Route | Notes |
 |----|------|-------|-------|--------|
-| A1 / A2 | CIIF / CIIE | A | Shanghai first | Full LRVTC, compressed fair |
-| B1 / B2 | CIIF / CIIE | B | Shanghai first | Compressed LRVTC, stronger fair |
+| A1 / A2 | CIIF / CIIE | A | Shanghai first | Full LZH+Wuhan tech, compressed fair |
+| B1 / B2 | CIIF / CIIE | B | Shanghai first | Compressed Wuhan (no night), stronger fair |
 | **C1** / C2 | CIIF / CIIE | C | Shanghai first | **C1 recommended** |
-| A1L / A2L | CIIF / CIIE | A | Liuzhou first | LRVTC then fair |
+| A1L / A2L | CIIF / CIIE | A | Liuzhou first | Tech then fair |
 | B1L / B2L | CIIF / CIIE | B | Liuzhou first | |
 | C1L / C2L | CIIF / CIIE | C | Liuzhou first | |
-| **L1** | NONE | C | Liuzhou only | Full LRVTC, no Shanghai fair |
+| **L1** | NONE | C | No fair | Full LZH+Wuhan, flexible dates (TBC) |
+| **L2** | NONE | C | No fair | Weekday programme (indicative mid-Oct 2026) |
 
 `DEFAULT_OPTION_ID = 'C1'`.
 
 ### Routing patterns
 
-- **Shanghai-first:** KLIA → Shanghai (fair) → Liuzhou (LRVTC) → KLIA  
-- **Liuzhou-first:** KLIA → Liuzhou (LRVTC) → Shanghai (fair) → KLIA  
-- **Liuzhou-only:** KLIA → Liuzhou (LRVTC) → KLIA  
+- **Shanghai-first:** KLIA → Shanghai (fair) → Liuzhou (LRVTC) → Wuhan → KLIA  
+- **Liuzhou-first:** KLIA → Liuzhou → Wuhan → Shanghai (fair) → KLIA  
+- **No fair (`liuzhou-only`):** KLIA → Liuzhou → Wuhan → KLIA  
+
+Liuzhou → Wuhan is **HSR (~5h)**. Practical wagon / rail ops learning is in **Wuhan**; LRVTC in Liuzhou is a campus / facility review day.
+
+In the package composer, Fair = **None** shows a **Schedule** choice: Flexible (TBC) → **L1**, Weekdays only → **L2**.
 
 ---
 
@@ -85,9 +90,9 @@ Options are defined in [`src/data/options.ts`](src/data/options.ts).
 
 - Budgets cover **ITaLI only (`ITALI_BUDGET_PAX = 3`)**.
 - **DDE** arranges its own costing (excluded from MYR totals).
-- Option costs live on each `TripOption.costs` (hotels nights, flights bands, fair fees, contingency).
+- Option costs live on each `TripOption.costs` (Shanghai / Liuzhou / Wuhan hotel nights, flights bands, fair fees, contingency).
 - Package builder ([`src/data/composer.ts`](src/data/composer.ts)) can replace planning bands with midpoints of **selected** flight/hotel price ranges when complete.
-- Liuzhou-only (`L1`): `shanghaiNights = 0`, `fairFeesPerPax = 0` — Shanghai hotel not required in the composer.
+- No-fair packages (`L1` / `L2`): `shanghaiNights = 0`, `fairFeesPerPax = 0` — Shanghai hotel not required in the composer.
 
 All figures are **indicative** for planning; reconfirm before ticketing.
 
@@ -148,7 +153,7 @@ src/
 
 ## Package composer behaviour
 
-1. Choose an itinerary option (all 13 appear in the dropdown).
+1. Choose an itinerary option (Fair / Depth / Route — or Schedule for Liuzhou-only).
 2. Choose a **hub** (Shanghai PVG or Guangzhou CAN):
    - Shanghai-first → hub is **return** path from Liuzhou  
    - Liuzhou-first → hub is **outbound** into Liuzhou; return after fair is via PVG  

@@ -72,15 +72,27 @@ export function ExecSummary({
               </div>
               <div className="arc" />
               {option.routeOrder === 'liuzhou-only' ? (
-                <div className="node accent">
-                  <span>LZH</span>
-                  <small>LRVTC</small>
-                </div>
+                <>
+                  <div className="node accent">
+                    <span>LZH</span>
+                    <small>LRVTC</small>
+                  </div>
+                  <div className="arc" />
+                  <div className="node accent">
+                    <span>WUH</span>
+                    <small>CRRC / ops</small>
+                  </div>
+                </>
               ) : option.routeOrder === 'liuzhou-first' ? (
                 <>
                   <div className="node accent">
                     <span>LZH</span>
                     <small>LRVTC</small>
+                  </div>
+                  <div className="arc" />
+                  <div className="node accent">
+                    <span>WUH</span>
+                    <small>CRRC / ops</small>
                   </div>
                   <div className="arc" />
                   <div className="node accent">
@@ -98,6 +110,11 @@ export function ExecSummary({
                   <div className="node accent">
                     <span>LZH</span>
                     <small>LRVTC</small>
+                  </div>
+                  <div className="arc" />
+                  <div className="node accent">
+                    <span>WUH</span>
+                    <small>CRRC / ops</small>
                   </div>
                 </>
               )}
@@ -230,7 +247,9 @@ export function BudgetSection({ option }: { option: TripOption }) {
         <div>
           <p className="eyebrow">Nights / pax</p>
           <p className="big-num">
-            {option.costs.shanghaiNights + option.costs.liuzhouNights}
+            {option.costs.shanghaiNights +
+              option.costs.liuzhouNights +
+              option.costs.wuhanNights}
           </p>
         </div>
       </div>
@@ -261,7 +280,8 @@ export function BudgetSection({ option }: { option: TripOption }) {
         {formatMyr(option.costs.intlFlightPerPax)}/pax; domestic ~
         {formatMyr(option.costs.domesticFlightsPerPax)}/pax; Shanghai hotel ~
         {formatMyr(option.costs.hotelShanghaiPerNight)}/night; Liuzhou ~
-        {formatMyr(option.costs.hotelLiuzhouPerNight)}/night; contingency{' '}
+        {formatMyr(option.costs.hotelLiuzhouPerNight)}/night; Wuhan ~
+        {formatMyr(option.costs.hotelWuhanPerNight)}/night; contingency{' '}
         {Math.round(option.costs.contingencyRate * 100)}%. DDE budget not included.
       </p>
     </section>

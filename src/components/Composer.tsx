@@ -3,6 +3,9 @@ import {
   ROUTE_ORDER_LABELS,
   formatMyr,
   routeStripLabel,
+  type DepthId,
+  type FairId,
+  type RouteOrder,
   type TripOption,
 } from '../data/options'
 import {
@@ -15,6 +18,7 @@ import {
   resolveFlight,
   getShanghaiHotels,
   getLiuzhouHotels,
+  getWuhanHotels,
   slotLabel,
   type ComposerSelections,
 } from '../data/composer'
@@ -32,8 +36,187 @@ interface Props {
   onFlightPick: (slot: FlightSlotId, key: string) => void
   shanghaiHotelName: string | null
   liuzhouHotelName: string | null
+  wuhanHotelName: string | null
   onShanghaiHotel: (name: string) => void
   onLiuzhouHotel: (name: string) => void
+  onWuhanHotel: (name: string) => void
+}
+
+function findPackage(
+  fair: FairId,
+  depth: DepthId,
+  routeOrder: RouteOrder,
+  liuzhouSchedule: 'flexible' | 'weekdays' = 'flexible',
+): TripOption | undefined {
+  if (fair === 'NONE' || routeOrder === 'liuzhou-only') {
+    return OPTIONS.find((o) => o.id === (liuzhouSchedule === 'weekdays' ? 'L2' : 'L1'))
+  }
+  return OPTIONS.find(
+    (o) => o.fair === fair && o.depth === depth && o.routeOrder === routeOrder,
+  )
+}
+
+function ItineraryChooser({
+  option,
+  onOptionChange,
+}: {
+  option: TripOption
+  onOptionChange: (id: string) => void
+}) {
+  const liuzhouOnly = option.routeOrder === 'liuzhou-only' || option.fair === 'NONE'
+  const liuzhouSchedule: 'flexible' | 'weekdays' = option.id === 'L2' ? 'weekdays' : 'flexible'
+
+  function apply(next: {
+    fair?: FairId
+    depth?: DepthId
+    routeOrder?: RouteOrder
+    liuzhouSchedule?: 'flexible' | 'weekdays'
+  }) {
+    const fair = next.fair ?? option.fair
+    const depth = next.depth ?? option.depth
+    let routeOrder = next.routeOrder ?? option.routeOrder
+    const schedule = next.liuzhouSchedule ?? liuzhouSchedule
+
+    if (fair === 'NONE') {
+      const match = findPackage('NONE', 'C', 'liuzhou-only', schedule)
+      if (match) onOptionChange(match.id)
+      return
+    }
+
+    if (routeOrder === 'liuzhou-only') {
+      routeOrder = 'shanghai-first'
+    }
+
+    const match =
+      findPackage(fair, depth, routeOrder) ??
+      findPackage(fair, depth, 'shanghai-first') ??
+      findPackage(fair, 'C', 'shanghai-first')
+    if (match) onOptionChange(match.id)
+  }
+
+  return (
+    <div className="itinerary-chooser">
+      <div className="chooser-filters">
+        <div className="filter-group">
+          <span className="composer-label">Fair</span>
+          {(
+            [
+              { id: 'CIIF' as const, label: 'CIIF' },
+              { id: 'CIIE' as const, label: 'CIIE' },
+              { id: 'NONE' as const, label: 'None (Liuzhou + Wuhan)' },
+            ] as const
+          ).map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              className={option.fair === f.id ? 'chip active' : 'chip'}
+              onClick={() => apply({ fair: f.id })}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        {liuzhouOnly ? (
+          <div className="filter-group">
+            <span className="composer-label">Schedule</span>
+            <button
+              type="button"
+              className={liuzhouSchedule === 'flexible' ? 'chip active' : 'chip'}
+              onClick={() => apply({ fair: 'NONE', liuzhouSchedule: 'flexible' })}
+            >
+              Flexible (TBC)
+            </button>
+            <button
+              type="button"
+              className={liuzhouSchedule === 'weekdays' ? 'chip active' : 'chip'}
+              onClick={() => apply({ fair: 'NONE', liuzhouSchedule: 'weekdays' })}
+            >
+              Weekdays only
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="filter-group">
+              <span className="composer-label">Depth</span>
+              {(['A', 'B', 'C'] as const).map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  className={option.depth === d ? 'chip active' : 'chip'}
+                  onClick={() => apply({ depth: d })}
+                  title={DEPTH_LABELS[d]}
+                >
+                  {d} · {DEPTH_LABELS[d]}
+                </button>
+              ))}
+            </div>
+
+            <div className="filter-group">
+              <span className="composer-label">Route order</span>
+              {(
+                [
+                  { id: 'shanghai-first' as const, label: 'Shanghai first' },
+                  { id: 'liuzhou-first' as const, label: 'Liuzhou first' },
+                ] as const
+              ).map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  className={option.routeOrder === r.id ? 'chip active' : 'chip'}
+                  onClick={() => apply({ routeOrder: r.id })}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className={`chooser-summary${option.recommended ? ' recommended' : ''}`}>
+        <div className="chooser-summary-top">
+          <span className="chooser-id">{option.id}</span>
+          {option.recommended && <span className="badge">Recommended</span>}
+        </div>
+        <h4>{option.name}</h4>
+        <p className="tagline">{option.tagline}</p>
+        <dl className="chooser-meta">
+          <div>
+            <dt>Route</dt>
+            <dd>{routeStripLabel(option.routeOrder)}</dd>
+          </div>
+          <div>
+            <dt>Window</dt>
+            <dd>{option.windowLabel}</dd>
+          </div>
+          <div>
+            <dt>Duration</dt>
+            <dd>{option.durationLabel}</dd>
+          </div>
+          <div>
+            <dt>Fair / tech</dt>
+            <dd>
+              {option.fairDays}d fair · {option.LRVTCDays}d LRVTC · {option.wuhanDays}d Wuhan (
+              {option.LRVTCMode})
+            </dd>
+          </div>
+        </dl>
+        {!liuzhouOnly && (
+          <p className="flight-sub">
+            {option.fair} · {DEPTH_LABELS[option.depth]} · {ROUTE_ORDER_LABELS[option.routeOrder]}
+          </p>
+        )}
+        {liuzhouOnly && (
+          <p className="flight-sub">
+            {liuzhouSchedule === 'weekdays'
+              ? 'LRVTC campus sessions on weekdays only'
+              : 'Dates flexible — lock with LRVTC host'}
+          </p>
+        )}
+      </div>
+    </div>
+  )
 }
 
 function FlightPicker({
@@ -211,11 +394,14 @@ export function ComposerSection({
   onFlightPick,
   shanghaiHotelName,
   liuzhouHotelName,
+  wuhanHotelName,
   onShanghaiHotel,
   onLiuzhouHotel,
+  onWuhanHotel,
 }: Props) {
   const shanghaiHotels = getShanghaiHotels()
   const liuzhouHotels = getLiuzhouHotels()
+  const wuhanHotels = getWuhanHotels()
 
   const selections: ComposerSelections = {
     option,
@@ -226,6 +412,7 @@ export function ComposerSection({
     returnIntl: resolveFlight(flightKeys.returnIntl),
     shanghaiHotel: shanghaiHotels.find((h) => h.name === shanghaiHotelName) ?? null,
     liuzhouHotel: liuzhouHotels.find((h) => h.name === liuzhouHotelName) ?? null,
+    wuhanHotel: wuhanHotels.find((h) => h.name === wuhanHotelName) ?? null,
   }
 
   const budget = calcSelectedBudget(selections)
@@ -244,28 +431,10 @@ export function ComposerSection({
       <div className="composer-panel no-print">
         <div className="composer-step">
           <h3>1 · Itinerary option</h3>
-          <div className="composer-picker">
-            <label className="composer-label" htmlFor="composer-option">
-              Package
-            </label>
-            <select
-              id="composer-option"
-              value={option.id}
-              onChange={(e) => onOptionChange(e.target.value)}
-            >
-              {OPTIONS.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.id} · {o.fair === 'NONE' ? 'No fair' : o.fair} · {DEPTH_LABELS[o.depth]} ·{' '}
-                  {ROUTE_ORDER_LABELS[o.routeOrder]} · {o.durationLabel}
-                  {o.recommended ? ' · Recommended' : ''}
-                </option>
-              ))}
-            </select>
-          </div>
           <p className="flight-sub">
-            {routeStripLabel(option.routeOrder)} · {option.windowLabel} · Fair {option.fairDays}d ·
-            LRVTC {option.LRVTCDays}d ({option.LRVTCMode})
+            Pick fair, depth, and route order — the matching package appears below.
           </p>
+          <ItineraryChooser option={option} onOptionChange={onOptionChange} />
         </div>
 
         <div className="composer-step">
@@ -295,14 +464,20 @@ export function ComposerSection({
           </div>
           {option.routeOrder === 'liuzhou-first' && (
             <p className="flight-sub">
-              After LRVTC, transfer LZH→PVG for the fair, then PVG→KUL home (return always via
-              Shanghai).
+              After Liuzhou + Wuhan, transfer WUH→PVG for the fair, then PVG→KUL home (return always
+              via Shanghai). Liuzhou→Wuhan is HSR (~5h), not a flight slot.
             </p>
           )}
           {option.routeOrder === 'liuzhou-only' && (
             <p className="flight-sub">
-              Outbound and return both use the selected hub (KUL↔LZH via CAN or PVG). No Shanghai
-              fair overnight.
+              Outbound uses the selected hub into Liuzhou; return from Wuhan via the same hub. HSR
+              Liuzhou→Wuhan (~5h) is included in planning bands, not a flight picker.
+            </p>
+          )}
+          {option.routeOrder === 'shanghai-first' && (
+            <p className="flight-sub">
+              After the fair: Shanghai→Liuzhou flight, then HSR to Wuhan; return from Wuhan via the
+              selected hub.
             </p>
           )}
           <div className="composer-grid">
@@ -349,13 +524,24 @@ export function ComposerSection({
                 onPick={onShanghaiHotel}
               />
             )}
-            <HotelPicker
-              id="hotel-liuzhou"
-              label={`Liuzhou · ${option.costs.liuzhouNights} nights`}
-              hotels={liuzhouHotels}
-              selectedName={liuzhouHotelName}
-              onPick={onLiuzhouHotel}
-            />
+            {option.costs.liuzhouNights > 0 && (
+              <HotelPicker
+                id="hotel-liuzhou"
+                label={`Liuzhou · ${option.costs.liuzhouNights} nights`}
+                hotels={liuzhouHotels}
+                selectedName={liuzhouHotelName}
+                onPick={onLiuzhouHotel}
+              />
+            )}
+            {option.costs.wuhanNights > 0 && (
+              <HotelPicker
+                id="hotel-wuhan"
+                label={`Wuhan · ${option.costs.wuhanNights} nights`}
+                hotels={wuhanHotels}
+                selectedName={wuhanHotelName}
+                onPick={onWuhanHotel}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -384,7 +570,11 @@ export function ComposerSection({
               const href =
                 item.includes('flight') || item.includes('Flight') || item.includes('Outbound')
                   ? '#flights'
-                  : item.includes('hotel') || item.includes('Hotel') || item.includes('Shanghai hotel') || item.includes('Liuzhou hotel')
+                  : item.includes('hotel') ||
+                      item.includes('Hotel') ||
+                      item.includes('Shanghai hotel') ||
+                      item.includes('Liuzhou hotel') ||
+                      item.includes('Wuhan hotel')
                     ? '#hotels'
                     : '#package'
               return (
@@ -452,11 +642,20 @@ export function ComposerSection({
               nights={option.costs.shanghaiNights}
             />
           )}
-          <HotelSummaryCard
-            title="Liuzhou"
-            hotel={selections.liuzhouHotel}
-            nights={option.costs.liuzhouNights}
-          />
+          {option.costs.liuzhouNights > 0 && (
+            <HotelSummaryCard
+              title="Liuzhou"
+              hotel={selections.liuzhouHotel}
+              nights={option.costs.liuzhouNights}
+            />
+          )}
+          {option.costs.wuhanNights > 0 && (
+            <HotelSummaryCard
+              title="Wuhan"
+              hotel={selections.wuhanHotel}
+              nights={option.costs.wuhanNights}
+            />
+          )}
         </div>
 
         <h4>ITaLI budget for this package ({budget.pax} pax)</h4>
@@ -496,11 +695,22 @@ export function ComposerSection({
                 {budget.shanghaiNights > 0 && (
                   <>
                     Shanghai {budget.shanghaiNights}n @ ~{formatMyr(budget.shanghaiRateUsed)}
-                    /night +{' '}
+                    /night
+                    {(budget.liuzhouNights > 0 || budget.wuhanNights > 0) && ' + '}
                   </>
                 )}
-                Liuzhou {budget.liuzhouNights}n @ ~{formatMyr(budget.liuzhouRateUsed)}/night ×{' '}
-                {budget.pax}
+                {budget.liuzhouNights > 0 && (
+                  <>
+                    Liuzhou {budget.liuzhouNights}n @ ~{formatMyr(budget.liuzhouRateUsed)}/night
+                    {budget.wuhanNights > 0 && ' + '}
+                  </>
+                )}
+                {budget.wuhanNights > 0 && (
+                  <>
+                    Wuhan {budget.wuhanNights}n @ ~{formatMyr(budget.wuhanRateUsed)}/night
+                  </>
+                )}{' '}
+                × {budget.pax}
               </td>
               <td>{formatMyr(budget.lodging)}</td>
             </tr>

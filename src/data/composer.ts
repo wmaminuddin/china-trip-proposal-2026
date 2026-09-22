@@ -26,21 +26,31 @@ export function slotLabel(
   hub: ReturnHub,
   routeOrder: RouteOrder,
 ): string {
-  if (routeOrder === 'liuzhou-only' || routeOrder === 'liuzhou-first') {
-    const hubCode = hub === 'guangzhou' ? 'CAN' : 'PVG'
+  const hubCode = hub === 'guangzhou' ? 'CAN' : 'PVG'
+
+  if (routeOrder === 'liuzhou-only') {
     switch (slot) {
       case 'outbound':
         return `Outbound · KLIA → ${hubCode}`
       case 'toLiuzhou':
         return `Connect · ${hubCode} → Liuzhou`
       case 'returnDomestic':
-        return routeOrder === 'liuzhou-only'
-          ? `Return domestic · Liuzhou → ${hubCode}`
-          : 'Transfer · Liuzhou → Shanghai'
+        return `Return domestic · Wuhan → ${hubCode}`
       case 'returnIntl':
-        return routeOrder === 'liuzhou-only'
-          ? `Return international · ${hubCode} → KLIA`
-          : 'Return · Shanghai → KLIA'
+        return `Return international · ${hubCode} → KLIA`
+    }
+  }
+
+  if (routeOrder === 'liuzhou-first') {
+    switch (slot) {
+      case 'outbound':
+        return `Outbound · KLIA → ${hubCode}`
+      case 'toLiuzhou':
+        return `Connect · ${hubCode} → Liuzhou`
+      case 'returnDomestic':
+        return 'Transfer · Wuhan → Shanghai'
+      case 'returnIntl':
+        return 'Return · Shanghai → KLIA'
     }
   }
 
@@ -51,8 +61,8 @@ export function slotLabel(
       return 'Transfer · Shanghai → Liuzhou'
     case 'returnDomestic':
       return hub === 'guangzhou'
-        ? 'Return domestic · Liuzhou → Guangzhou'
-        : 'Return domestic · Liuzhou → Shanghai'
+        ? 'Return domestic · Wuhan → Guangzhou'
+        : 'Return domestic · Wuhan → Shanghai'
     case 'returnIntl':
       return hub === 'guangzhou'
         ? 'Return international · Guangzhou → KLIA'
@@ -68,12 +78,12 @@ export const FLIGHT_SLOT_META: Record<
   outbound: { label: 'Outbound · KLIA → Shanghai', legIds: 'kul-pvg' },
   toLiuzhou: { label: 'Transfer · Shanghai → Liuzhou', legIds: 'pvg-lzh' },
   returnDomestic: {
-    label: 'Return domestic · Liuzhou → hub',
-    legIds: { shanghai: 'lzh-pvg', guangzhou: 'lzh-can-kul' },
+    label: 'Return domestic · Wuhan → hub',
+    legIds: { shanghai: 'wuh-pvg', guangzhou: 'wuh-can-kul' },
   },
   returnIntl: {
     label: 'Return international · hub → KLIA',
-    legIds: { shanghai: 'pvg-kul', guangzhou: 'lzh-can-kul' },
+    legIds: { shanghai: 'pvg-kul', guangzhou: 'wuh-can-kul' },
   },
 }
 
@@ -83,42 +93,43 @@ export function getSlotLegId(
   routeOrder: RouteOrder,
 ): string {
   if (routeOrder === 'liuzhou-only') {
-    // Hub for both outbound into LZH and return home.
+    // Hub for outbound into LZH; return home from Wuhan via same hub.
     switch (slot) {
       case 'outbound':
         return hub === 'guangzhou' ? 'kul-can' : 'kul-pvg'
       case 'toLiuzhou':
         return hub === 'guangzhou' ? 'can-lzh' : 'pvg-lzh'
       case 'returnDomestic':
-        return hub === 'guangzhou' ? 'lzh-can-kul' : 'lzh-pvg'
+        return hub === 'guangzhou' ? 'wuh-can-kul' : 'wuh-pvg'
       case 'returnIntl':
-        return hub === 'guangzhou' ? 'lzh-can-kul' : 'pvg-kul'
+        return hub === 'guangzhou' ? 'wuh-can-kul' : 'pvg-kul'
     }
   }
 
   if (routeOrder === 'liuzhou-first') {
-    // Hub chooses outbound path into LZH; return after fair is always via Shanghai.
+    // Hub chooses outbound into LZH; after Wuhan, transfer WUH→PVG for fair; home PVG→KUL.
     switch (slot) {
       case 'outbound':
         return hub === 'guangzhou' ? 'kul-can' : 'kul-pvg'
       case 'toLiuzhou':
         return hub === 'guangzhou' ? 'can-lzh' : 'pvg-lzh'
       case 'returnDomestic':
-        return 'lzh-pvg'
+        return 'wuh-pvg'
       case 'returnIntl':
         return 'pvg-kul'
     }
   }
 
+  // shanghai-first: end in Wuhan
   switch (slot) {
     case 'outbound':
       return 'kul-pvg'
     case 'toLiuzhou':
       return 'pvg-lzh'
     case 'returnDomestic':
-      return hub === 'guangzhou' ? 'lzh-can-kul' : 'lzh-pvg'
+      return hub === 'guangzhou' ? 'wuh-can-kul' : 'wuh-pvg'
     case 'returnIntl':
-      return hub === 'guangzhou' ? 'lzh-can-kul' : 'pvg-kul'
+      return hub === 'guangzhou' ? 'wuh-can-kul' : 'pvg-kul'
   }
 }
 
@@ -127,25 +138,31 @@ export function flightSummaryTitle(
   hub: ReturnHub,
   routeOrder: RouteOrder,
 ): string {
-  if (routeOrder === 'liuzhou-only' || routeOrder === 'liuzhou-first') {
-    const hubCode = hub === 'guangzhou' ? 'CAN' : 'PVG'
+  const hubCode = hub === 'guangzhou' ? 'CAN' : 'PVG'
+
+  if (routeOrder === 'liuzhou-only') {
     switch (slot) {
       case 'outbound':
         return `Outbound KUL → ${hubCode}`
       case 'toLiuzhou':
         return `${hubCode} → LZH`
       case 'returnDomestic':
-        return routeOrder === 'liuzhou-only'
-          ? hub === 'shanghai'
-            ? 'LZH → PVG'
-            : 'LZH → CAN'
-          : 'LZH → PVG'
+        return hub === 'shanghai' ? 'WUH → PVG' : 'WUH → CAN'
       case 'returnIntl':
-        return routeOrder === 'liuzhou-only'
-          ? hub === 'shanghai'
-            ? 'PVG → KUL'
-            : 'CAN → KUL'
-          : 'PVG → KUL'
+        return hub === 'shanghai' ? 'PVG → KUL' : 'CAN → KUL'
+    }
+  }
+
+  if (routeOrder === 'liuzhou-first') {
+    switch (slot) {
+      case 'outbound':
+        return `Outbound KUL → ${hubCode}`
+      case 'toLiuzhou':
+        return `${hubCode} → LZH`
+      case 'returnDomestic':
+        return 'WUH → PVG'
+      case 'returnIntl':
+        return 'PVG → KUL'
     }
   }
 
@@ -155,7 +172,7 @@ export function flightSummaryTitle(
     case 'toLiuzhou':
       return 'PVG → LZH'
     case 'returnDomestic':
-      return hub === 'shanghai' ? 'LZH → PVG' : 'LZH → CAN'
+      return hub === 'shanghai' ? 'WUH → PVG' : 'WUH → CAN'
     case 'returnIntl':
       return hub === 'shanghai' ? 'PVG → KUL' : 'CAN → KUL'
   }
@@ -186,7 +203,7 @@ export function resolveFlight(key: string | null): (FlightOption & { legId: stri
   return { ...flight, legId: parsed.legId }
 }
 
-/** For Guangzhou hub, domestic = LZH→CAN only; intl = CAN→KUL only */
+/** For Guangzhou hub, domestic = WUH→CAN only; intl = CAN→KUL only */
 export function optionsForSlot(
   slot: FlightSlotId,
   hub: ReturnHub,
@@ -198,17 +215,11 @@ export function optionsForSlot(
   if (
     (routeOrder === 'shanghai-first' || routeOrder === 'liuzhou-only') &&
     hub === 'guangzhou' &&
-    legId === 'lzh-can-kul'
+    legId === 'wuh-can-kul'
   ) {
     if (slot === 'returnDomestic') {
-      options = options.filter(
-        (f) =>
-          f.from.toUpperCase().includes('LZH') ||
-          f.code.includes('CZ8264') ||
-          f.to.toUpperCase().includes('CAN'),
-      )
       const domestic = options.filter(
-        (f) => f.from.includes('LZH') && f.to.includes('CAN'),
+        (f) => f.from.includes('WUH') && f.to.includes('CAN'),
       )
       if (domestic.length) options = domestic
     }
@@ -230,6 +241,10 @@ export function getLiuzhouHotels(): HotelOption[] {
   return HOTEL_BLOCKS.find((b) => b.id === 'liuzhou-lrvtc')?.hotels ?? []
 }
 
+export function getWuhanHotels(): HotelOption[] {
+  return HOTEL_BLOCKS.find((b) => b.id === 'wuhan-crrc')?.hotels ?? []
+}
+
 export function mid(min?: number, max?: number): number | null {
   if (min == null && max == null) return null
   if (min != null && max != null) return Math.round((min + max) / 2)
@@ -245,6 +260,7 @@ export interface ComposerSelections {
   returnIntl: (FlightOption & { legId: string }) | null
   shanghaiHotel: HotelOption | null
   liuzhouHotel: HotelOption | null
+  wuhanHotel: HotelOption | null
 }
 
 export function calcSelectedBudget(sel: ComposerSelections, pax: number = ITALI_BUDGET_PAX) {
@@ -275,8 +291,9 @@ export function calcSelectedBudget(sel: ComposerSelections, pax: number = ITALI_
 
   const shRate = mid(sel.shanghaiHotel?.myrMin, sel.shanghaiHotel?.myrMax) ?? c.hotelShanghaiPerNight
   const lzRate = mid(sel.liuzhouHotel?.myrMin, sel.liuzhouHotel?.myrMax) ?? c.hotelLiuzhouPerNight
+  const whRate = mid(sel.wuhanHotel?.myrMin, sel.wuhanHotel?.myrMax) ?? c.hotelWuhanPerNight
   const lodging =
-    (shRate * c.shanghaiNights + lzRate * c.liuzhouNights) * pax
+    (shRate * c.shanghaiNights + lzRate * c.liuzhouNights + whRate * c.wuhanNights) * pax
 
   const fair = c.fairFeesPerPax * pax
   const local = c.localTransportPerDay * tripDays * pax
@@ -294,12 +311,13 @@ export function calcSelectedBudget(sel: ComposerSelections, pax: number = ITALI_
   }
   if (!sel.returnDomestic) {
     missing.push(
-      order === 'liuzhou-first' ? 'Liuzhou → Shanghai flight' : 'Return domestic flight',
+      order === 'liuzhou-first' ? 'Wuhan → Shanghai flight' : 'Return domestic flight',
     )
   }
   if (!sel.returnIntl) missing.push('Return to KLIA flight')
   if (c.shanghaiNights > 0 && !sel.shanghaiHotel) missing.push('Shanghai hotel')
-  if (!sel.liuzhouHotel) missing.push('Liuzhou hotel')
+  if (c.liuzhouNights > 0 && !sel.liuzhouHotel) missing.push('Liuzhou hotel')
+  if (c.wuhanNights > 0 && !sel.wuhanHotel) missing.push('Wuhan hotel')
 
   return {
     lodging,
@@ -315,8 +333,10 @@ export function calcSelectedBudget(sel: ComposerSelections, pax: number = ITALI_
     pax,
     shanghaiRateUsed: shRate,
     liuzhouRateUsed: lzRate,
+    wuhanRateUsed: whRate,
     shanghaiNights: c.shanghaiNights,
     liuzhouNights: c.liuzhouNights,
+    wuhanNights: c.wuhanNights,
     missing,
     complete: missing.length === 0,
     usedFlightFallback: !flightsComplete || flightOneWays.some((f) => !f),
